@@ -24,7 +24,23 @@ Understanding the system helps you write better prompts:
 
 This means PROMPT.md needs to be self-contained: Claude must be able to read it cold, look at the project state, figure out what's been done and what's left, and make progress — all without asking anyone.
 
-## Your Approach
+## Automated Mode (Scheduler Invocation)
+
+When this skill is invoked with a `## Task` section and a `## Loop Directory` path, it means the **scheduler UI** created this task automatically. In this mode:
+
+1. **Do NOT execute the task itself.** Your job is to create PROMPT.md and JUDGE.md, NOT to perform the task.
+2. **Do NOT ask the user questions** (no AskUserQuestion). There is no interactive user in this session.
+3. **Quickly explore the codebase** to understand the project context (tech stack, structure, conventions).
+4. **Write PROMPT.md and JUDGE.md directly** into the Loop Directory path provided.
+5. **Do NOT write to `.claude/PROMPT.md` or `.claude/JUDGE.md`** — write to the Loop Directory instead (e.g., `{Loop Directory}/PROMPT.md` and `{Loop Directory}/JUDGE.md`).
+
+The task description from `## Task` should be expanded into a well-structured PROMPT.md and JUDGE.md following the templates below. Infer reasonable requirements and completion criteria from the task description and codebase context.
+
+**This is critical: you are a prompt architect, not a task executor. If the task says "check the news", you write a PROMPT.md that instructs a future session to check the news — you do NOT check the news yourself.**
+
+## Interactive Mode (User Invocation)
+
+When invoked directly by a user (no `## Loop Directory` section), follow the interactive approach below.
 
 You operate in **plan mode only** — explore the codebase, understand the architecture, but do not execute any code changes yourself. Your job is to be the prompt architect, not the coder.
 
@@ -134,6 +150,10 @@ Ask if anything needs adjusting. Common tweaks:
 Once the user approves, write both files:
 - `.claude/PROMPT.md`
 - `.claude/JUDGE.md`
+
+If a Loop Directory was provided, write to that directory instead:
+- `{Loop Directory}/PROMPT.md`
+- `{Loop Directory}/JUDGE.md`
 
 Then tell the user: **"Your Ralph Loop is ready. Start it from Clay's UI — you'll see a 'Ralph Loop' button in the header."**
 
