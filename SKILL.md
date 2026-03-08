@@ -143,6 +143,10 @@ If a Loop Directory was provided, write to that directory instead:
 - `{Loop Directory}/PROMPT.md`
 - `{Loop Directory}/JUDGE.md`
 
+After writing the files, suggest a short descriptive title for this loop (under 40 characters). Output it on its own line in this exact format:
+
+`[[LOOP_TITLE: Your suggested title here]]`
+
 Then tell the user: **"Your Ralph Loop is ready. Start it from Clay's UI — you'll see a 'Ralph Loop' button in the header."**
 
 ## Important Reminders
