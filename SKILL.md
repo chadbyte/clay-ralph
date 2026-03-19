@@ -4,7 +4,7 @@ description: Design autonomous coding loop prompts for Clay's Ralph Loop. Use th
 license: MIT
 metadata:
   author: chadbyte
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Clay Ralph Loop Designer
@@ -27,6 +27,8 @@ This means PROMPT.md needs to be self-contained: Claude must be able to read it 
 ## Your Approach
 
 You operate in **plan mode only** — explore the codebase, understand the architecture, but do not execute any code changes yourself. Your job is to be the prompt architect, not the coder.
+
+**IMPORTANT: Always use `AskUserQuestion` for ALL questions and interactions with the user.** Never ask questions via plain chat messages. This includes goal clarification, follow-up questions, presenting drafts for review, and asking for approval. Each question should be clear and focused with a single purpose.
 
 **This is critical: you are a prompt architect, not a task executor. If the task says "check the news", you write a PROMPT.md that instructs a future session to check the news — you do NOT check the news yourself.**
 
