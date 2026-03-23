@@ -4,7 +4,7 @@ description: Design autonomous coding loop prompts for Clay's Ralph Loop. Use th
 license: MIT
 metadata:
   author: chadbyte
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
 # Clay Ralph Loop Designer
@@ -18,7 +18,7 @@ Understanding the system helps you write better prompts:
 1. Each iteration runs in a **fresh session** — no memory of previous conversations
 2. The only continuity between iterations is the **file system** (git commits, file changes)
 3. After each iteration, a separate **judge session** evaluates completion
-4. The judge sees the original PROMPT.md + JUDGE.md + `git diff` — nothing else
+4. The judge sees PROMPT.md + JUDGE.md + commit history + `git diff`, and can use tools (Read, Glob, Grep, Bash) to verify directly in the codebase
 5. If the judge says PASS, the loop stops. If FAIL, another iteration starts
 6. Interactive tools (AskUserQuestion, EnterPlanMode) are automatically blocked — the session must be fully autonomous
 
@@ -90,22 +90,24 @@ Write a prompt that a fresh Claude session can pick up and run with. The prompt 
 
 ### Phase 4: Draft JUDGE.md
 
-The judge evaluates whether the task is **done**, not whether each iteration was good. It sees:
+The judge evaluates whether the task is **done**, not whether each iteration was good. It receives:
 - The original PROMPT.md (the goal)
 - The JUDGE.md (your criteria)
+- Commit history since the loop started
 - A cumulative `git diff` from when the loop started
+- Full tool access (Read, Glob, Grep, Bash) to verify directly in the codebase
 
-The judge does NOT see Claude's conversation output — only code changes. This prevents bias from Claude claiming "I did everything!" when the code tells a different story.
+The judge does NOT see Claude's conversation output. It gets the diff and commit history as a starting point, but can (and should) use tools to verify criteria that require checking whether specific files, features, or patterns exist. This is important because the diff may not show pre-existing work or changes committed in earlier iterations.
 
-Write clear, verifiable criteria. The judge should be able to look at a diff and determine pass/fail without ambiguity.
+Write clear, verifiable criteria. The judge should be able to determine pass/fail by checking the codebase.
 
-**Good criteria** (observable in a diff):
+**Good criteria** (verifiable in the codebase):
 - "All API endpoints have corresponding test files"
 - "A dark mode toggle exists in the settings page"
 - "JWT authentication middleware is applied to all /api routes"
 - "GitHub Actions workflow file exists at .github/workflows/ci.yml"
 
-**Bad criteria** (subjective or unverifiable from a diff):
+**Bad criteria** (subjective or unverifiable):
 - "Code is clean and well-organized"
 - "The implementation is efficient"
 - "Everything works correctly"
@@ -117,7 +119,7 @@ Write clear, verifiable criteria. The judge should be able to look at a diff and
 
 The task is complete when ALL of the following are true:
 
-- [Criterion 1 — something visible in the code changes]
+- [Criterion 1 — something verifiable in the codebase]
 - [Criterion 2]
 - [Criterion 3]
 - No build errors or failing tests are introduced
@@ -155,6 +157,6 @@ Then tell the user: **"Your Ralph Loop is ready. Start it from Clay's UI — you
 
 - Stay in plan mode. Explore and advise, but don't implement.
 - The prompt must work for a session that has zero prior context.
-- The judge must be evaluable purely from a git diff.
+- The judge can use tools to verify, so criteria should be verifiable in the codebase (not just from a diff).
 - Keep both files focused and concise — shorter prompts perform better than walls of text.
 - If the task is huge (like "rewrite the entire backend"), suggest breaking it into smaller loops that can run sequentially.
